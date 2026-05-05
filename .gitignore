@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.m4a
+*.wav
+*.ogg
+*.mp3
+asset/
+.env
+*.egg-info/
+dist/
+build/

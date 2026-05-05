@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatTTS Web - 文字转语音</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="22"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>ChatTTS Web</h1>
+                    <span class="tagline">智能文字转语音</span>
+                </div>
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">
+                <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+                <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+        </header>
+
+        <main class="main">
+            <!-- Presets Panel -->
+            <aside class="presets-panel">
+                <h2>场景预设</h2>
+                <div class="presets-grid">
+                    <button class="preset-btn active" data-preset="default">
+                        <span class="preset-icon">🎙️</span>
+                        <span>默认</span>
+                    </button>
+                    <button class="preset-btn" data-preset="news">
+                        <span class="preset-icon">📰</span>
+                        <span>新闻</span>
+                    </button>
+                    <button class="preset-btn" data-preset="story">
+                        <span class="preset-icon">📖</span>
+                        <span>故事</span>
+                    </button>
+                    <button class="preset-btn" data-preset="chat">
+                        <span class="preset-icon">💬</span>
+                        <span>对话</span>
+                    </button>
+                    <button class="preset-btn" data-preset="poetry">
+                        <span class="preset-icon">🎭</span>
+                        <span>朗诵</span>
+                    </button>
+                    <button class="preset-btn" data-preset="tech">
+                        <span class="preset-icon">💻</span>
+                        <span>技术</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Workspace -->
+            <div class="workspace">
+                <!-- Text Input Card -->
+                <div class="card text-card">
+                    <div class="card-header">
+                        <h3>输入文本</h3>
+                        <div class="char-indicator">
+                            <span id="current-char">0</span>
+                            <span class="divider">/</span>
+                            <span class="max">500</span>
+                        </div>
+                    </div>
+                    <textarea
+                        id="text-input"
+                        placeholder="在这里输入要转换的文本，支持中文、英文混合..."
+                    ></textarea>
+                    <div class="text-actions">
+                        <button class="text-action-btn" id="clear-btn" title="清空文本">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </button>
+                        <button class="text-action-btn" id="paste-btn" title="粘贴">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Parameters Card -->
+                <div class="card params-card">
+                    <div class="card-header">
+                        <h3>语音参数</h3>
+                        <button class="reset-btn" id="reset-params">重置</button>
+                    </div>
+                    <div class="params-grid">
+                        <div class="param-item">
+                            <div class="param-header">
+                                <label for="speed">语速</label>
+                                <span class="param-value" id="speed-value">5</span>
+                            </div>
+                            <input type="range" id="speed" min="1" max="9" value="5" step="1" class="slider">
+                            <div class="param-labels">
+                                <span>慢速</span>
+                                <span>快速</span>
+                            </div>
+                        </div>
+
+                        <div class="param-item">
+                            <div class="param-header">
+                                <label for="temperature">温度</label>
+                                <span class="param-value" id="temperature-value">0.3</span>
+                            </div>
+                            <input type="range" id="temperature" min="0.1" max="1.0" value="0.3" step="0.1" class="slider">
+                            <div class="param-labels">
+                                <span>稳定</span>
+                                <span>创造</span>
+                            </div>
+                        </div>
+
+                        <div class="param-item">
+                            <div class="param-header">
+                                <label for="top_k">Top-K</label>
+                                <span class="param-value" id="top_k-value">20</span>
+                            </div>
+                            <input type="range" id="top_k" min="1" max="100" value="20" step="1" class="slider">
+                            <div class="param-labels">
+                                <span>保守</span>
+                                <span>多样</span>
+                            </div>
+                        </div>
+
+                        <div class="param-item">
+                            <div class="param-header">
+                                <label for="top_p">Top-P</label>
+                                <span class="param-value" id="top_p-value">0.7</span>
+                            </div>
+                            <input type="range" id="top_p" min="0.0" max="1.0" value="0.7" step="0.1" class="slider">
+                            <div class="param-labels">
+                                <span>精确</span>
+                                <span>广泛</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <button class="generate-btn" id="generate-btn">
+                    <span class="btn-content">
+                        <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="22"/>
+                        </svg>
+                        <span class="btn-text">生成语音</span>
+                    </span>
+                    <span class="btn-loading">
+                        <span class="loading-spinner"></span>
+                        <span>生成中...</span>
+                    </span>
+                </button>
+
+                <!-- Audio Output -->
+                <div class="audio-card card" id="audio-section" hidden>
+                    <div class="audio-header">
+                        <h3>语音预览</h3>
+                        <span class="audio-duration" id="audio-duration"></span>
+                    </div>
+                    <div class="audio-player">
+                        <audio id="audio-player" controls></audio>
+                    </div>
+                    <div class="waveform-container">
+                        <canvas id="waveform-canvas"></canvas>
+                    </div>
+                    <div class="audio-actions">
+                        <button class="action-btn" id="play-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                            <span>播放</span>
+                        </button>
+                        <button class="action-btn primary" id="download-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            <span>下载 WAV</span>
+                        </button>
+                        <button class="action-btn" id="copy-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            <span>复制</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by <a href="https://github.com/2Noise/ChatTTS" target="_blank">ChatTTS</a></p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
